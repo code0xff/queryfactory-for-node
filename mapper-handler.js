@@ -1,7 +1,6 @@
 const fs = require('fs');
 const queryTypes = ['insert', 'select', 'update', 'delete'];
 let ignoreList = [];
-const dbConnect = require('./db-connect');
 
 exports.loadMapperConfig = (projectPath, configPath) => {
     let rawData = fs.readFileSync(projectPath + configPath + '/mapper-config.json', 'utf8');
@@ -12,9 +11,7 @@ exports.loadMapperConfig = (projectPath, configPath) => {
         return;
     }
     
-    if (JSONData.connection !== undefined) {
-        dbConnect.openConnection(JSONData.connection);
-    } else {
+    if (JSONData.connection === undefined) {
         console.log('connection is not exist. please check mapper-config.json.');
         return;
     }
