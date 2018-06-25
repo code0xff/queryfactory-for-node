@@ -1,12 +1,12 @@
-const mapperHandler = require('./mapper-handler');
+const jsonHandler = require('./json-handler');
 const connection = require('./db-connect');
 
 let queryFactory = {};
 
 exports.createQueryFactory = (projectPath, configPath) => {
-    const config = mapperHandler.loadMapperConfig(projectPath, configPath);
+    const config = jsonHandler.loadMapperConfig(projectPath, configPath);
     connection.openConnection(config.connection);
-    queryFactory = mapperHandler.loadQueries(projectPath, config.mappers);
+    queryFactory = jsonHandler.loadQueries(projectPath, config.mappers);
 }
 
 exports.select = async (key, param) => {
