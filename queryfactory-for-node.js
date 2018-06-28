@@ -17,25 +17,46 @@ exports.select = async (key, param) => {
     return result;
 }   
 
-exports.insert = async (key, param) => {
+exports.insertSync = async (key, param) => {
     const sql = getQuery('insert', key, param);
     console.log(sql);
 
-    await connection.insert(sql);
+    await connection.insertSync(sql);
 }
-    
-exports.update = async (key, param) => {
+
+exports.insert = (key, param) => {
+    const sql = getQuery('insert', key, param);
+    console.log(sql);
+
+    connection.insert(sql);
+}
+ 
+exports.updateSync = async (key, param) => {
     const sql = getQuery('update', key, param);
     console.log(sql);
 
     await connection.update(sql);
 }
 
-exports.delete = async (key, param) => {
+exports.update = (key, param) => {
+    const sql = getQuery('update', key, param);
+    console.log(sql);
+
+    connection.update(sql);
+}
+
+exports.deleteSync = async (key, param) => {
     const sql = getQuery('delete', key, param);
     console.log(sql);
 
     await connection.delete(sql);
+}
+
+exports.delete = (key, param) => {
+    const sql = getQuery('delete', key, param);
+    console.log(sql);
+
+    connection.delete(sql);
 }
 
 const insertParamIntoSQL = (sql, param) => {
