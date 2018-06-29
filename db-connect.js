@@ -1,4 +1,4 @@
-const mysql = require('promise-mysql');
+const mysql = require('mysql');
 
 let pool;
 
@@ -6,63 +6,46 @@ exports.openConnection = (dbConfig) => {
     pool = mysql.createPool(dbConfig);
 }
 
-exports.select = async (sql) => {
-    const conn = await pool.getConnection();
-    const result = await conn.query(sql).catch(error => {
-        conn.connection.release();
-        throw error;
-    });
-    conn.connection.release();
-    return result;
-}
-
-exports.insertSync = async (sql) => {
-    await querySync(sql);
-}
-
-exports.insert = (sql) => {
-    query(sql);
-}
-
-exports.deleteSync = async (sql) => {
-    await querySync(sql);
-}
-
-exports.delete = (sql) => {
-    query(sql);
-}
-
-exports.updateSync = async (sql) => {
-    await querySync(sql);
-}
-
-exports.update = (sql) => {
-    query(sql);
-}
-
-const query = async (sql) => {
-    const conn = await pool.getConnection();
-    conn.query(sql)
-    .then((data) => {
-        // console.log(data);
-        conn.commit();
-        conn.connection.release();
-    })
-    .catch(error => {
-        conn.rollback();
-        conn.connection.release();
-        throw error;
+exports.query = (sql) => {
+    return new Promise((resolve, reject) => {
+        pool.getConnection((error, connection) => {
+            if (error) {
+                reject(error);
+                return;
+            }
+            connection.query(sql, (error, result) => {
+                if (error) {
+                    connection.rollback();
+                    connection.release();
+                    reject(error);
+                    return;
+                }
+                connection.commit();   
+                connection.release();
+                resolve(result);
+                return;
+            });
+        });
     });
 }
 
-const querySync = async (sql) => {
-    const conn = await pool.getConnection();
-    const result = await conn.query(sql).catch(error => {
-        conn.rollback();
-        conn.connection.release();
-        throw error;
+exports.select = (sql) => {
+    return new Promise((resolve, reject) => {
+        pool.getConnection((error, connection) => {
+            if (error) {
+                reject(error);
+                return;
+            }
+            connection.query(sql, (error, rows) => {
+                if (error) {
+                    connection.release();
+                    reject(error);
+                    return;
+                }   
+                connection.release();
+                resolve(rows);
+                return;
+            });
+        });
     });
-    // console.log(result);
-    conn.commit();
-    conn.connection.release();
 }
