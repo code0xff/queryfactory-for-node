@@ -9,54 +9,60 @@ exports.createQueryFactory = (projectPath, configPath) => {
     queryFactory = jsonHandler.loadQueries(projectPath, config.mappers);
 }
 
-exports.select = async (key, param) => {
-    const sql = getQuery('select', key, param);
-    console.log(sql);
-
-    const result = await connection.select(sql);
-    return result;
-}   
-
-exports.insertSync = async (key, param) => {
-    const sql = getQuery('insert', key, param);
-    console.log(sql);
-
-    await connection.insertSync(sql);
-}
-
 exports.insert = (key, param) => {
-    const sql = getQuery('insert', key, param);
-    console.log(sql);
+    return new Promise((resolve, reject) => {
+        const sql = getQuery('insert', key, param);
 
-    connection.insert(sql);
+        connection.query(sql)
+        .then((result) => {
+            resolve(result);
+        })
+        .catch((error) => {
+            reject(error);
+        });
+    });
 }
- 
-exports.updateSync = async (key, param) => {
-    const sql = getQuery('update', key, param);
-    console.log(sql);
 
-    await connection.update(sql);
+exports.select = (key, param) => {
+    return new Promise((resolve, reject) => {
+        const sql = getQuery('select', key, param);
+
+        connection.select(sql)
+        .then((data) => {
+            resolve(data);
+        })
+        .catch((error) => {
+            reject(error);
+        });
+    });
 }
 
 exports.update = (key, param) => {
-    const sql = getQuery('update', key, param);
-    console.log(sql);
+    return new Promise((resolve, reject) => {
+        const sql = getQuery('update', key, param);
 
-    connection.update(sql);
-}
-
-exports.deleteSync = async (key, param) => {
-    const sql = getQuery('delete', key, param);
-    console.log(sql);
-
-    await connection.delete(sql);
+        connection.query(sql)
+        .then((result) => {
+            resolve(result);
+        })
+        .catch((error) => {
+            reject(error);
+        });
+    });
 }
 
 exports.delete = (key, param) => {
-    const sql = getQuery('delete', key, param);
-    console.log(sql);
+    return new Promise((resolve, reject) => {
+        const sql = getQuery('delete', key, param);
 
-    connection.delete(sql);
+        connection.query(sql)
+        .then((result) => {
+            resolve(result);
+        })
+        .catch((error) => {
+            reject(error);
+        });
+    });
 }
 
 const insertParamIntoSQL = (sql, param) => {
