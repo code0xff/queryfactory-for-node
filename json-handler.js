@@ -6,6 +6,11 @@ exports.loadMapperConfig = (projectPath, configPath) => {
     let rawData = fs.readFileSync(projectPath + configPath + '/mapper-config.json', 'utf8');
     let JSONData = JSON.parse(rawData);
 
+    if (JSONData.database === undefined) {
+        console.log('database is not exist. please check mapper-config.json.');
+        return;
+    }
+
     if (JSONData.mappers === undefined) {
         console.log('mappers is not exist. please check mapper-config.json.');
         return;
