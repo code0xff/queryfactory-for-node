@@ -1,5 +1,5 @@
 const jsonHandler = require('./json-handler');
-const connection = require('./mysql-caller');
+const connection = require('./mysql-wrapper');
 
 let queryFactory = {};
 
