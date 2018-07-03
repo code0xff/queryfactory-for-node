@@ -1,11 +1,17 @@
 const jsonHandler = require('./json-handler');
-const connection = require('./mysql-wrapper');
+let connection;
 
 let queryFactory = {};
 
 exports.createQueryFactory = (projectPath, configPath) => {
     const config = jsonHandler.loadMapperConfig(projectPath, configPath);
-    connection.openConnection(config.connection);
+    const module = setConnection(config.database);
+    connection = require(module);
+    if (connection) {
+        connection.openConnection(config.connection);
+    } else {
+        console.log('database informaiton is not valid. please check database name.(you can only use mysql, postgresql.)')
+    }
     queryFactory = jsonHandler.loadQueries(projectPath, config.mappers);
 }
 
@@ -80,6 +86,18 @@ const getQuery = (type, key, param) => {
         return;
     }
     return insertParamIntoSQL(queryFactory[type][key], param);
+}
+
+const setConnection = (param) => {
+    const database = param.toLowerCase();
+    switch (database) {
+        case 'mysql':
+            return './mysql-wrapper';
+        case 'postgresql':
+            return './pg-wrapper';
+        default:
+            return false;
+    }
 }
 
 exports.getQueryList = () => {
