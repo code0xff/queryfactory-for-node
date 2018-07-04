@@ -6,7 +6,8 @@ exports.openConnection = (dbConfig) => {
     pool = mysql.createPool(dbConfig);
 }
 
-exports.query = (sql) => {
+exports.query = (sql, param) => {
+    sql = insertParam(sql, param);
     return new Promise((resolve, reject) => {
         pool.getConnection((error, connection) => {
             if (error) {
@@ -29,7 +30,8 @@ exports.query = (sql) => {
     });
 }
 
-exports.select = (sql) => {
+exports.select = (sql, param) => {
+    sql = insertParam(sql, param);
     return new Promise((resolve, reject) => {
         pool.getConnection((error, connection) => {
             if (error) {
@@ -47,5 +49,15 @@ exports.select = (sql) => {
                 return;
             });
         });
+    });
+}
+
+const insertParam = (sql, param) => {
+    if (!param) return sql;
+    return sql.replace(/\:(\w+)/g, (txt, key) => {
+        if (param.hasOwnProperty(key)) {
+            return pool.escape(param[key]);
+        }
+        return txt;
     });
 }
