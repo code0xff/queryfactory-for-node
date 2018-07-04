@@ -7,10 +7,11 @@ exports.openConnection = (dbConfig) => {
     client.connect();
 }
 
-exports.query = (sql) => {
+exports.query = (sql, param) => {
+    const data = insertParam(sql, param);
     return new Promise((resolve, reject) => {
         client
-        .query(sql, (error, result) => {
+        .query(data.sql, data.values, (error, result) => {
             if (error) {
                 reject(error);
                 return;
@@ -20,10 +21,11 @@ exports.query = (sql) => {
     });
 }
 
-exports.select = (sql) => {
+exports.select = (sql, param) => {
+    const data = insertParam(sql, param);
     return new Promise((resolve, reject) => {
         client
-        .query(sql, (error, result) => {
+        .query(data.sql, data.values, (error, result) => {
             if (error) {
                 reject(error);
                 return;
@@ -31,4 +33,21 @@ exports.select = (sql) => {
             resolve(result.rows);
         });
     });
+}
+
+const insertParam = (sql, param) => {
+    if (!param) return sql;
+
+    const keys = Object.keys(param);
+    let values = [];
+    for (let i = 1; i <= keys.length; i++) {
+        let key = keys[i - 1];
+        sql = sql.replace(':' + key, ('$' + i));
+        values.push(param[key]);
+    }
+    const data = {
+        sql,
+        values
+    }
+    return data;
 }
