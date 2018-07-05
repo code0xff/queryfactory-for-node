@@ -8,10 +8,10 @@ exports.openConnection = (dbConfig) => {
 }
 
 exports.query = (sql, param) => {
-    const data = insertParam(sql, param);
+    const {pgOriginalSql, values} = restructureSql(sql, param);
     return new Promise((resolve, reject) => {
         client
-        .query(data.sql, data.values, (error, result) => {
+        .query(pgOriginalSql, values, (error, result) => {
             if (error) {
                 reject(error);
                 return;
@@ -22,10 +22,10 @@ exports.query = (sql, param) => {
 }
 
 exports.select = (sql, param) => {
-    const data = insertParam(sql, param);
+    const {pgOriginalSql, values} = restructureSql(sql, param);
     return new Promise((resolve, reject) => {
         client
-        .query(data.sql, data.values, (error, result) => {
+        .query(pgOriginalSql, values, (error, result) => {
             if (error) {
                 reject(error);
                 return;
@@ -35,19 +35,20 @@ exports.select = (sql, param) => {
     });
 }
 
-const insertParam = (sql, param) => {
+const restructureSql = (sql, param) => {
+    let pgOriginalSql = sql;
     let values = [];
     if (param) {
         const keys = Object.keys(param);
     
         for (let i = 1; i <= keys.length; i++) {
             let key = keys[i - 1];
-            sql = sql.replace(new RegExp(':' + key, 'g'), ('$' + i));
+            pgOriginalSql = pgOriginalSql.replace(new RegExp(':' + key, 'g'), ('$' + i));
             values.push(param[key]);
         }
     }
     return {
-        sql,
+        pgOriginalSql,
         values
     };
 }
