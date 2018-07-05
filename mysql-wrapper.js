@@ -7,7 +7,7 @@ exports.openConnection = (dbConfig) => {
 }
 
 exports.query = (sql, param) => {
-    sql = insertParam(sql, param);
+    sql = injectParameter(sql, param);
     return new Promise((resolve, reject) => {
         pool.getConnection((error, connection) => {
             if (error) {
@@ -31,7 +31,7 @@ exports.query = (sql, param) => {
 }
 
 exports.select = (sql, param) => {
-    sql = insertParam(sql, param);
+    sql = injectParameter(sql, param);
     return new Promise((resolve, reject) => {
         pool.getConnection((error, connection) => {
             if (error) {
@@ -52,7 +52,7 @@ exports.select = (sql, param) => {
     });
 }
 
-const insertParam = (sql, param) => {
+const injectParameter = (sql, param) => {
     if (!param) return sql;
     return sql.replace(/\:(\w+)/g, (txt, key) => {
         if (param.hasOwnProperty(key)) {
