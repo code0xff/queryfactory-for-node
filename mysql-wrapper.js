@@ -6,22 +6,26 @@ exports.openConnection = (dbConfig) => {
     pool = mysql.createPool(dbConfig);
 }
 
-exports.query = (sql, param) => {
-    sql = injectParameter(sql, param);
+exports.query = (sql, param, commit) => {
     return new Promise((resolve, reject) => {
         pool.getConnection((error, connection) => {
+            if (connection.config.queryFormat !== customFormat) {
+                connection.config.queryFormat = customFormat;
+            }
             if (error) {
                 reject(error);
                 return;
             }
-            connection.query(sql, (error, result) => {
+            connection.query(sql, param, (error, result) => {
                 if (error) {
                     connection.rollback();
                     connection.release();
                     reject(error);
                     return;
                 }
-                connection.commit();   
+                if (commit) {
+                    connection.commit();
+                }
                 connection.release();
                 resolve(result);
                 return;
@@ -31,14 +35,16 @@ exports.query = (sql, param) => {
 }
 
 exports.select = (sql, param) => {
-    sql = injectParameter(sql, param);
     return new Promise((resolve, reject) => {
         pool.getConnection((error, connection) => {
+            if (connection.config.queryFormat !== customFormat) {
+                connection.config.queryFormat = customFormat;
+            }
             if (error) {
                 reject(error);
                 return;
             }
-            connection.query(sql, (error, rows) => {
+            connection.query(sql, param, (error, rows) => {
                 if (error) {
                     connection.release();
                     reject(error);
@@ -52,12 +58,12 @@ exports.select = (sql, param) => {
     });
 }
 
-const injectParameter = (sql, param) => {
-    if (!param) return sql;
-    return sql.replace(/\:(\w+)/g, (txt, key) => {
-        if (param.hasOwnProperty(key)) {
-            return pool.escape(param[key]);
+const customFormat = function (query, values) {
+    if (!values) return query;
+    return query.replace(/\:(\w+)/g, function (txt, key) {
+        if (values.hasOwnProperty(key)) {
+            return this.escape(values[key]);
         }
         return txt;
-    });
-}
+    }.bind(this));
+};

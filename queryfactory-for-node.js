@@ -15,7 +15,7 @@ exports.createQueryFactory = (projectPath, configPath) => {
     queryFactory = jsonHandler.loadQueries(projectPath, config.mappers);
 }
 
-exports.insert = (key, param) => {
+exports.insert = (key, param, commit=true) => {
     return new Promise((resolve, reject) => {
         const sql = getQuery('insert', key);
 
@@ -43,7 +43,7 @@ exports.select = (key, param) => {
     });
 }
 
-exports.update = (key, param) => {
+exports.update = (key, param, commit=true) => {
     return new Promise((resolve, reject) => {
         const sql = getQuery('update', key);
 
@@ -57,7 +57,7 @@ exports.update = (key, param) => {
     });
 }
 
-exports.delete = (key, param) => {
+exports.delete = (key, param, commit=true) => {
     return new Promise((resolve, reject) => {
         const sql = getQuery('delete', key);
 
