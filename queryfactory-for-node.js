@@ -19,7 +19,7 @@ exports.insert = (key, param, commit=true) => {
     return new Promise((resolve, reject) => {
         const sql = getQuery('insert', key);
 
-        connection.query(sql, param)
+        connection.query(sql, param, commit)
         .then((result) => {
             resolve(result);
         })
@@ -47,7 +47,7 @@ exports.update = (key, param, commit=true) => {
     return new Promise((resolve, reject) => {
         const sql = getQuery('update', key);
 
-        connection.query(sql, param)
+        connection.query(sql, param, commit)
         .then((result) => {
             resolve(result);
         })
@@ -61,7 +61,7 @@ exports.delete = (key, param, commit=true) => {
     return new Promise((resolve, reject) => {
         const sql = getQuery('delete', key);
 
-        connection.query(sql, param)
+        connection.query(sql, param, commit)
         .then((result) => {
             resolve(result);
         })

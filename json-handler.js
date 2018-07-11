@@ -6,23 +6,25 @@ exports.loadMapperConfig = (projectPath, configPath) => {
     let rawData = fs.readFileSync(projectPath + configPath + '/mapper-config.json', 'utf8');
     let JSONData = JSON.parse(rawData);
 
-    if (JSONData.database === undefined) {
+    const {database, mappers, connection, ignore} = JSONData;
+
+    if (database === undefined) {
         console.log('database is not exist. please check mapper-config.json.');
         return;
     }
 
-    if (JSONData.mappers === undefined) {
+    if (mappers === undefined) {
         console.log('mappers is not exist. please check mapper-config.json.');
         return;
     }
     
-    if (JSONData.connection === undefined) {
+    if (connection === undefined) {
         console.log('connection is not exist. please check mapper-config.json.');
         return;
     }
 
-    if (JSONData.ignore !== undefined) {
-        ignoreList = JSONData.ignore;
+    if (ignore !== undefined) {
+        ignoreList = ignore;
     }
     
     return JSONData;
