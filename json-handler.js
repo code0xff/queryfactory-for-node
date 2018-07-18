@@ -65,10 +65,14 @@ exports.loadQueries = (projectPath, mapperPath) => {
 
             for (let key in queries) {
                 if (queryList[queryType][key] !== undefined) {
-                    console.log(queryType + ' is duplicate key.');
+                    console.log(queryType + ' has duplicate key.');
                     return;
                 }
-                queryList[queryType][key] = queries[key];
+                if (queries[key].constructor == Array) {
+                    queryList[queryType][key] = queries[key].join('');
+                } else {
+                    queryList[queryType][key] = queries[key];
+                }
             }
         }
     }
